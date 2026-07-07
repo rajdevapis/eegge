@@ -3,178 +3,328 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raj Coding - Professional IDE & APK Generator</title>
+    <title>Raj Coding v2 - Enterprise Cloud IDE</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { display: flex; height: 100vh; background: #0f0f11; color: #e1e1e6; overflow: hidden; }
+        body { display: flex; height: 100vh; background: #0b0b0d; color: #f0f6fc; overflow: hidden; }
         
-        /* Sidebar Navigation Layout */
-        .sidebar { width: 320px; background: #18181c; padding: 20px; display: flex; flex-direction: column; gap: 20px; border-right: 1px solid #2a2a30; overflow-y: auto; }
-        .brand-title { color: #58a6ff; font-size: 24px; font-weight: bold; text-align: center; border-bottom: 2px solid #2a2a30; padding-bottom: 10px; }
+        .sidebar { width: 340px; background: #16161a; padding: 20px; display: flex; flex-direction: column; gap: 20px; border-right: 1px solid #21262d; overflow-y: auto; }
+        .workspace { flex: 1; display: flex; flex-direction: column; background: #0d1117; position: relative; }
+        .brand { text-align: center; padding-bottom: 15px; border-bottom: 2px solid #21262d; }
+        .brand h2 { color: #58a6ff; font-size: 22px; margin: 0; }
         
-        /* Main Workspace Container */
-        .workspace { flex: 1; display: flex; flex-direction: column; }
-        .top-navbar { height: 65px; background: #141416; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border-bottom: 1px solid #2a2a30; }
-        
-        /* Workspace Editor Splitter */
-        .editor-zone { flex: 1; display: flex; }
-        textarea { flex: 1; background: #1e1e24; color: #a3ebd4; border: none; padding: 20px; font-family: 'Consolas', monospace; font-size: 15px; resize: none; outline: none; line-height: 1.5; }
-        .live-preview { width: 45%; background: #ffffff; border-left: 2px solid #2a2a30; }
-        
-        /* Premium UI Input Elements & Buttons */
-        .input-group { display: flex; flex-direction: column; gap: 6px; }
-        label { font-size: 12px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; }
-        input { padding: 10px; background: #222227; border: 1px solid #3a3a42; color: #fff; border-radius: 6px; outline: none; }
+        .card { background: #21262d; padding: 15px; border-radius: 8px; border: 1px solid #30363d; display: flex; flex-direction: column; gap: 12px; }
+        .card h4 { color: #58a6ff; font-size: 14px; text-transform: uppercase; }
+        .input-box { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 11px; color: #8b949e; font-weight: 600; }
+        input[type="text"], input[type="file"] { padding: 10px; background: #0d1117; border: 1px solid #30363d; color: #fff; border-radius: 6px; outline: none; width: 100%; font-size: 13px; }
         input:focus { border-color: #58a6ff; }
         
-        .btn { background: #238636; color: white; border: none; padding: 12px; cursor: pointer; border-radius: 6px; font-weight: 600; text-align: center; transition: 0.3s; }
+        .btn { background: #238636; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 6px; font-weight: 600; text-align: center; font-size: 13px; }
         .btn:hover { background: #2ea043; }
         .btn-blue { background: #1f6feb; }
         .btn-blue:hover { background: #388bfd; }
+        .btn-secondary { background: #30363d; color: #c9d1d9; border: 1px solid #8b949e; }
         
-        .config-box { background: #222227; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 12px; border: 1px solid #2a2a30; }
+        .navbar { height: 60px; background: #16161a; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; border-bottom: 1px solid #21262d; }
+        .editor-container { flex: 1; display: flex; background: #161b22; }
+        .code-area { flex: 1; background: #0d1117; color: #79c0ff; padding: 20px; font-family: monospace; font-size: 14px; border: none; resize: none; outline: none; }
+        .live-frame { width: 45%; background: #ffffff; border-left: 2px solid #30363d; }
+        
+        .file-item { padding: 8px 12px; background: #0d1117; border: 1px solid #30363d; border-radius: 6px; margin-top: 5px; display: flex; justify-content: space-between; cursor: pointer; font-size: 13px; }
+        .file-item:hover { border-color: #58a6ff; }
+
+        /* Android Simulation System Styles */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .android-dialog { width: 320px; background: #2d2d34; border-radius: 14px; padding: 20px; color: #fff; box-shadow: 0 10px 25px rgba(0,0,0,0.5); font-family: sans-serif; }
+        .android-header { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .android-icon { width: 45px; height: 45px; background: #3ddc84; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #fff; font-size: 20px; }
+        .android-title { font-size: 18px; font-weight: 600; }
+        .android-body { font-size: 14px; color: #b3b3b3; margin-bottom: 20px; line-height: 1.4; }
+        .android-actions { display: flex; justify-content: flex-end; gap: 15px; }
+        .android-btn { background: transparent; color: #3ddc84; border: none; font-size: 14px; font-weight: bold; cursor: pointer; }
+        .progress-bar-container { width: 100%; background: #444; height: 4px; border-radius: 2px; margin-top: 10px; display: none; }
+        .progress-bar-fill { background: #3ddc84; height: 100%; width: 0%; transition: width 0.1s linear; }
+
+        /* Update Float Alert Box */
+        .update-box { position: fixed; top: 20px; right: 20px; background: #f85149; color: white; padding: 15px 20px; border-radius: 8px; display: none; flex-direction: column; gap: 10px; z-index: 999; }
     </style>
 </head>
 <body>
 
-    <div class="sidebar">
-        <div class="brand-title">Raj Coding v1.0</div>
-        
-        <div class="config-box">
-            <div class="input-group">
-                <label>Project Engine</label>
-                <input type="text" id="projName" placeholder="Enter Project Name">
-            </div>
-            <button class="btn btn-blue" onclick="initProject()">📁 Create Project Workspace</button>
+    <!-- Update Popup Alert Block -->
+    <div id="updateNotification" class="update-box">
+        <strong id="updateTitle">⚠️ Update Available!</strong>
+        <p style="font-size:12px;">An updated build profile detected.</p>
+        <button class="btn" style="background:#fff; color:#f85149; font-size:12px;" id="updateLinkBtn" onclick="window.open(this.dataset.url, '_blank')">Download New Version</button>
+    </div>
+
+    <!-- Sidebar Dashboard Controls -->
+    <div class="sidebar" id="sidebarPanel">
+        <div class="brand">
+            <h2>Raj Coding v2</h2>
+            <small style="color:#8b949e;">Premium Project Environment</small>
         </div>
 
-        <div class="config-box">
-            <div class="input-group">
-                <label>Upload Entire ZIP Project</label>
-                <input type="file" id="zipFile" accept=".zip">
-            </div>
-            <button class="btn" style="background: #8957e5;" onclick="uploadZipProject()">📦 Extract & Import ZIP</button>
+        <!-- Create Project Matrix -->
+        <div class="card" id="projectCreationCard">
+            <h4>1. Project Engine</h4>
+            <div class="input-box"><input type="text" id="newProjectName" placeholder="Enter Project Name"></div>
+            <button class="btn btn-blue" onclick="execCreateProject()">➕ Create New Project</button>
         </div>
 
-        <div class="config-box">
-            <h4 style="color:#58a6ff;">Android APK Builder Settings</h4>
-            <div class="input-group">
-                <label>Application Name</label>
-                <input type="text" id="apkName" placeholder="My Awesome App">
+        <!-- ZIP Import -->
+        <div class="card" id="resourceImportCard" style="display:none;">
+            <h4>2. Resource Importer</h4>
+            <div class="input-box"><label>Upload Compressed ZIP</label><input type="file" id="zipSelector" accept=".zip"></div>
+            <button class="btn" style="background:#8957e5;" onclick="execImportZip()">📦 Extract & Sync ZIP</button>
+        </div>
+
+        <!-- File Tree Manager -->
+        <div class="card" id="fileManagerCard" style="display:none;">
+            <h4>3. Workspace Files</h4>
+            <div style="display:flex; gap:5px;">
+                <input type="text" id="newFileName" placeholder="index.html / index.php" style="flex:1;">
+                <button class="btn btn-blue" onclick="execCreateFile()">Add</button>
             </div>
-            <div class="input-group">
-                <label>Package ID Domain</label>
-                <input type="text" id="pkgName" placeholder="com.rajcoding.myapp">
-            </div>
-            <div class="input-group">
-                <label>App Version Match</label>
-                <input type="text" id="appVersion" value="1.0.0">
-            </div>
-            <div class="input-group">
-                <label>App Icon Asset</label>
-                <input type="file" id="appIcon" accept="image/*">
-            </div>
-            <div class="input-group">
-                <label>Custom Entry File (HTML / PHP)</label>
-                <input type="text" id="entryFile" placeholder="index.html" value="index.html">
-            </div>
-            <button class="btn" style="background:#da3633;" onclick="triggerApkCompilation()">🚀 Build Android APK</button>
+            <div id="fileTreeContainer" style="max-height:150px; overflow-y:auto;"></div>
+        </div>
+
+        <!-- Native Android Build Center -->
+        <div class="card" id="apkBuilderCard" style="display:none;">
+            <h4>4. APK Build Target</h4>
+            <div class="input-box"><label>App Title</label><input type="text" id="apkTitle"></div>
+            <div class="input-box"><label>Package ID</label><input type="text" id="apkPackage" placeholder="com.rajcoding.app"></div>
+            <div class="input-box"><label>Version</label><input type="text" id="apkVersion" value="1.0.0"></div>
+            <div class="input-box"><label>App Icon</label><input type="file" id="apkIcon" accept="image/*"></div>
+            <div class="input-box"><label>Entry File</label><input type="text" id="apkEntryFile" value="index.html"></div>
+            <button class="btn" style="background:#da3633;" onclick="execTriggerBuild()">🚀 Build App</button>
         </div>
     </div>
 
+    <!-- Main Workspace -->
     <div class="workspace">
-        <div class="top-navbar">
-            <div style="display: flex; gap: 10px; align-items: center;">
-                <input type="text" id="fileName" placeholder="index.html" style="width: 180px;">
-                <button class="btn btn-blue" style="padding: 8px 15px;" onclick="commitFileSave()">💾 Save & Execute</button>
+        <div class="navbar">
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button class="btn btn-secondary" id="backToExplorerBtn" style="display:none;" onclick="navigateBackToDashboard()">⬅️ Back to Project</button>
+                <span id="currentActiveWorkspaceTitle" style="font-weight:600; color:#58a6ff;">No Active Project Selected</span>
             </div>
-            <div>
-                <button class="btn" style="background:#6e7681; padding: 8px 15px;" onclick="renderLivePreview()">🔄 Live Preview Sync</button>
+            <div style="display:flex; gap:10px;" id="editorControlHeader" style="display:none;">
+                <button class="btn btn-blue" onclick="execSaveCurrentFileCode()">💾 Save & Sync Data</button>
+                <button class="btn btn-secondary" onclick="syncLiveIframePreview()">🔄 Sync Live Preview</button>
             </div>
         </div>
 
-        <div class="editor-zone">
-            <textarea id="sourceCode" placeholder=""></textarea>
-            <iframe id="liveSandbox" class="live-preview"></iframe>
+        <!-- Editor Box -->
+        <div class="editor-container" id="ideEditorZone" style="display:none;">
+            <textarea id="codeTextEditor" class="code-area" placeholder="Paste your clean script blocks here..."></textarea>
+            <iframe id="sandboxPreviewFrame" class="live-frame"></iframe>
+        </div>
+    </div>
+
+    <!-- Android Dialog Simulator Prompt -->
+    <div id="androidModal" class="modal-overlay">
+        <div class="android-dialog">
+            <div class="android-header">
+                <div class="android-icon" id="simAppBadge">R</div>
+                <div>
+                    <div class="android-title" id="simAppName">App Name</div>
+                    <small style="color:#3ddc84; font-size:11px;" id="simAppPkg">com.pkg</small>
+                </div>
+            </div>
+            <div class="android-body" id="simBodyText">Do you want to install this application inside your phone?</div>
+            
+            <div class="progress-bar-container" id="simProgressContainer">
+                <div class="progress-bar-fill" id="simProgressFill"></div>
+            </div>
+            
+            <div class="android-actions" id="simActionButtonsPanel">
+                <button class="android-btn" style="color:#aaa;" onclick="closeAndroidSimulatorPopup()">CANCEL</button>
+                <button class="android-btn" onclick="startSimulatedInstallationProgress()">INSTALL</button>
+            </div>
+            <div class="android-actions" id="simPostInstallButtonsPanel" style="display:none;">
+                <button class="android-btn" style="color:#aaa;" onclick="closeAndroidSimulatorPopup()">DONE</button>
+                <button class="android-btn" onclick="launchSimulatedAppLivePreview()">OPEN</button>
+            </div>
         </div>
     </div>
 
     <script>
-        let operationalProject = "DefaultWorkspace";
+        let activeProjectScope = "";
+        let activeFileScope = "";
+        let fileRegistryMap = [];
 
-        async function initProject() {
-            const pName = document.getElementById('projName').value;
-            if(!pName) return alert('Bhai, Project name daalna compulsory hai!');
-            operationalProject = pName;
+        async function execCreateProject() {
+            const pName = document.getElementById('newProjectName').value.trim();
+            if(!pName || /[^\w-]/.test(pName)) return alert("Bhai, Valid Project Name daalo bina space ke!");
             
-            const response = await fetch('/api/create-project', {
+            const req = await fetch('/api/create-project', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ projectName: pName })
             });
-            const status = await response.json();
-            alert(status.message || status.error);
+            const res = await req.json();
+            if(res.success) {
+                alert(`Project ${pName} created in Raj Coding!`);
+                activeProjectScope = pName;
+                document.getElementById('currentActiveWorkspaceTitle').innerText = "Active Workspace: " + pName;
+                
+                document.getElementById('projectCreationCard').style.display = "none";
+                document.getElementById('resourceImportCard').style.display = "block";
+                document.getElementById('fileManagerCard').style.display = "block";
+                document.getElementById('apkBuilderCard').style.display = "block";
+                document.getElementById('ideEditorZone').style.display = "flex";
+                document.getElementById('editorControlHeader').style.display = "flex";
+            }
         }
 
-        async function commitFileSave() {
-            const fName = document.getElementById('fileName').value || 'index.html';
-            const codeData = document.getElementById('sourceCode').value;
+        async function execCreateFile() {
+            const fName = document.getElementById('newFileName').value.trim();
+            if(!fName) return alert("Bhai, file name daalo!");
             
-            const response = await fetch('/api/save-file', {
+            const req = await fetch('/api/save-file', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ projectName: operationalProject, fileName: fName, code: codeData })
+                body: JSON.stringify({ projectName: activeProjectScope, fileName: fName, code: "" })
             });
-            const status = await response.json();
-            if(status.success) {
-                renderLivePreview();
-            } else {
-                alert("Error: " + status.error);
+            const res = await req.json();
+            if(res.success) {
+                document.getElementById('newFileName').value = "";
+                if(!fileRegistryMap.includes(fName)) fileRegistryMap.push(fName);
+                refreshLocalWorkspaceFileTree();
+                openSelectedFileContext(fName);
             }
         }
 
-        function renderLivePreview() {
-            const rawCode = document.getElementById('sourceCode').value;
-            const sandboxIframe = document.getElementById('liveSandbox');
-            sandboxIframe.srcdoc = rawCode; 
+        function refreshLocalWorkspaceFileTree() {
+            const container = document.getElementById('fileTreeContainer');
+            container.innerHTML = "";
+            fileRegistryMap.forEach(file => {
+                const item = document.createElement('div');
+                item.className = "file-item";
+                item.innerHTML = `<span>📄 ${file}</span><span style='color:#58a6ff; font-size:11px;'>Edit</span>`;
+                item.onclick = () => openSelectedFileContext(file);
+                container.appendChild(item);
+            });
         }
 
-        async function uploadZipProject() {
-            const zipInput = document.getElementById('zipFile').files[0];
-            if(!zipInput) return alert("Bhai, pehle ZIP file select karo!");
-            
-            const formData = new FormData();
-            formData.append('zipFile', zipInput);
-            formData.append('projectName', operationalProject);
-
-            alert("ZIP Uploading aur Extraction shuru ho gaya hai...");
-            const response = await fetch('/api/upload-zip', { method: 'POST', body: formData });
-            const status = await response.json();
-            alert(status.message || status.error);
+        function openSelectedFileContext(fileName) {
+            activeFileScope = fileName;
+            document.getElementById('currentActiveWorkspaceTitle').innerText = "Editing: " + activeProjectScope + " / " + fileName;
+            document.getElementById('backToExplorerBtn').style.display = "inline-block";
+            document.getElementById('codeTextEditor').value = ""; 
+            syncLiveIframePreview();
         }
 
-        async function triggerApkCompilation() {
-            const formData = new FormData();
-            formData.append('projectName', operationalProject);
-            formData.append('appName', document.getElementById('apkName').value);
-            formData.append('packageName', document.getElementById('pkgName').value);
-            formData.append('version', document.getElementById('appVersion').value);
-            formData.append('entryFile', document.getElementById('entryFile').value);
-            
-            const iconFile = document.getElementById('appIcon').files[0];
-            if(iconFile) formData.append('appIcon', iconFile);
+        function navigateBackToDashboard() {
+            document.getElementById('backToExplorerBtn').style.display = "none";
+            document.getElementById('currentActiveWorkspaceTitle').innerText = "Active Workspace: " + activeProjectScope;
+            activeFileScope = "";
+        }
 
-            alert("Raj Coding Engine: Compiler started inside isolated sandbox Docker environment. Please wait...");
+        async function execSaveCurrentFileCode() {
+            const codePayload = document.getElementById('codeTextEditor').value;
+            const req = await fetch('/api/save-file', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ projectName: activeProjectScope, fileName: activeFileScope, code: codePayload })
+            });
+            const res = await req.json();
+            if(res.success) syncLiveIframePreview();
+        }
+
+        function syncLiveIframePreview() {
+            document.getElementById('sandboxPreviewFrame').srcdoc = document.getElementById('codeTextEditor').value;
+        }
+
+        async function execImportZip() {
+            const fileObj = document.getElementById('zipSelector').files[0];
+            if(!fileObj) return alert("ZIP select karo bhai!");
             
-            const response = await fetch('/api/build-apk', { method: 'POST', body: formData });
-            const status = await response.json();
+            const form = new FormData();
+            form.append('zipFile', fileObj);
+            form.append('projectName', activeProjectScope);
             
-            if(status.success) {
-                alert("Badhai ho! APK Build successfully complete.");
-                window.location.href = status.downloadUrl; // Automatically download the generated APK
-            } else {
-                alert("Build Failed: " + status.error);
+            alert("Extracting...");
+            const req = await fetch('/api/upload-zip', { method: 'POST', body: form });
+            const res = await req.json();
+            if(res.success) {
+                alert(res.message);
+                if(!fileRegistryMap.includes("index.html")) fileRegistryMap.push("index.html");
+                refreshLocalWorkspaceFileTree();
             }
+        }
+
+        async function execTriggerBuild() {
+            const appTitle = document.getElementById('apkTitle').value;
+            const appPkg = document.getElementById('apkPackage').value;
+            const appVer = document.getElementById('apkVersion').value;
+            const appEntry = document.getElementById('apkEntryFile').value;
+            
+            const form = new FormData();
+            form.append('projectName', activeProjectScope);
+            form.append('appName', appTitle);
+            form.append('packageName', appPkg);
+            form.append('version', appVer);
+            form.append('entryFile', appEntry);
+            
+            const req = await fetch('/api/build-apk', { method: 'POST', body: form });
+            const res = await req.json();
+            
+            if(res.success) {
+                if(res.updateTriggered) {
+                    showDynamicFloatingUpdateUI(res.updateUrl, appTitle);
+                }
+                triggerAndroidSimulatorWorkflow(appTitle, appPkg);
+            }
+        }
+
+        // Android Fake UI System
+        function triggerAndroidSimulatorWorkflow(name, pkg) {
+            document.getElementById('simAppName').innerText = name;
+            document.getElementById('simAppPkg').innerText = pkg;
+            document.getElementById('simAppBadge').innerText = name.charAt(0).toUpperCase();
+            document.getElementById('simBodyText').innerText = "Do you want to install this application?";
+            
+            document.getElementById('simActionButtonsPanel').style.display = "flex";
+            document.getElementById('simPostInstallButtonsPanel').style.display = "none";
+            document.getElementById('simProgressContainer').style.display = "none";
+            document.getElementById('androidModal').style.display = "flex";
+        }
+
+        function startSimulatedInstallationProgress() {
+            document.getElementById('simActionButtonsPanel').style.display = "none";
+            document.getElementById('simProgressContainer').style.display = "block";
+            document.getElementById('simBodyText').innerText = "Installing application...";
+            
+            let fillElement = document.getElementById('simProgressFill');
+            let widthPercent = 0;
+            let timer = setInterval(() => {
+                widthPercent += 10;
+                fillElement.style.width = widthPercent + "%";
+                if(widthPercent >= 100) {
+                    clearInterval(timer);
+                    document.getElementById('simBodyText').innerText = "App installed successfully.";
+                    document.getElementById('simProgressContainer').style.display = "none";
+                    document.getElementById('simPostInstallButtonsPanel').style.display = "flex";
+                }
+            }, 200);
+        }
+
+        function launchSimulatedAppLivePreview() {
+            closeAndroidSimulatorPopup();
+            syncLiveIframePreview();
+        }
+
+        function closeAndroidSimulatorPopup() {
+            document.getElementById('androidModal').style.display = "none";
+        }
+
+        function showDynamicFloatingUpdateUI(url, name) {
+            const popup = document.getElementById('updateNotification');
+            document.getElementById('updateTitle').innerText = "⚠️ Update: " + name;
+            document.getElementById('updateLinkBtn').dataset.url = url;
+            popup.style.display = "flex";
         }
     </script>
 </body>
