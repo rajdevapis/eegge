@@ -1,7 +1,7 @@
 {
-  "name": "raj-coding",
-  "version": "1.0.0",
-  "description": "Raj Coding - Advanced Cloud IDE & APK Builder",
+  "name": "raj-coding-v2",
+  "version": "2.0.0",
+  "description": "Raj Coding - Premium Anti-Hack Cloud IDE & App Builder",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
