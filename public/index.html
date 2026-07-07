@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raj Coding - Professional IDE & APK Generator</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { display: flex; height: 100vh; background: #0f0f11; color: #e1e1e6; overflow: hidden; }
+        
+        /* Sidebar Navigation Layout */
+        .sidebar { width: 320px; background: #18181c; padding: 20px; display: flex; flex-direction: column; gap: 20px; border-right: 1px solid #2a2a30; overflow-y: auto; }
+        .brand-title { color: #58a6ff; font-size: 24px; font-weight: bold; text-align: center; border-bottom: 2px solid #2a2a30; padding-bottom: 10px; }
+        
+        /* Main Workspace Container */
+        .workspace { flex: 1; display: flex; flex-direction: column; }
+        .top-navbar { height: 65px; background: #141416; display: flex; align-items: center; justify-content: space-between; padding: 0 25px; border-bottom: 1px solid #2a2a30; }
+        
+        /* Workspace Editor Splitter */
+        .editor-zone { flex: 1; display: flex; }
+        textarea { flex: 1; background: #1e1e24; color: #a3ebd4; border: none; padding: 20px; font-family: 'Consolas', monospace; font-size: 15px; resize: none; outline: none; line-height: 1.5; }
+        .live-preview { width: 45%; background: #ffffff; border-left: 2px solid #2a2a30; }
+        
+        /* Premium UI Input Elements & Buttons */
+        .input-group { display: flex; flex-direction: column; gap: 6px; }
+        label { font-size: 12px; color: #8b949e; text-transform: uppercase; letter-spacing: 1px; }
+        input { padding: 10px; background: #222227; border: 1px solid #3a3a42; color: #fff; border-radius: 6px; outline: none; }
+        input:focus { border-color: #58a6ff; }
+        
+        .btn { background: #238636; color: white; border: none; padding: 12px; cursor: pointer; border-radius: 6px; font-weight: 600; text-align: center; transition: 0.3s; }
+        .btn:hover { background: #2ea043; }
+        .btn-blue { background: #1f6feb; }
+        .btn-blue:hover { background: #388bfd; }
+        
+        .config-box { background: #222227; padding: 15px; border-radius: 8px; display: flex; flex-direction: column; gap: 12px; border: 1px solid #2a2a30; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="brand-title">Raj Coding v1.0</div>
+        
+        <div class="config-box">
+            <div class="input-group">
+                <label>Project Engine</label>
+                <input type="text" id="projName" placeholder="Enter Project Name">
+            </div>
+            <button class="btn btn-blue" onclick="initProject()">📁 Create Project Workspace</button>
+        </div>
+
+        <div class="config-box">
+            <div class="input-group">
+                <label>Upload Entire ZIP Project</label>
+                <input type="file" id="zipFile" accept=".zip">
+            </div>
+            <button class="btn" style="background: #8957e5;" onclick="uploadZipProject()">📦 Extract & Import ZIP</button>
+        </div>
+
+        <div class="config-box">
+            <h4 style="color:#58a6ff;">Android APK Builder Settings</h4>
+            <div class="input-group">
+                <label>Application Name</label>
+                <input type="text" id="apkName" placeholder="My Awesome App">
+            </div>
+            <div class="input-group">
+                <label>Package ID Domain</label>
+                <input type="text" id="pkgName" placeholder="com.rajcoding.myapp">
+            </div>
+            <div class="input-group">
+                <label>App Version Match</label>
+                <input type="text" id="appVersion" value="1.0.0">
+            </div>
+            <div class="input-group">
+                <label>App Icon Asset</label>
+                <input type="file" id="appIcon" accept="image/*">
+            </div>
+            <div class="input-group">
+                <label>Custom Entry File (HTML / PHP)</label>
+                <input type="text" id="entryFile" placeholder="index.html" value="index.html">
+            </div>
+            <button class="btn" style="background:#da3633;" onclick="triggerApkCompilation()">🚀 Build Android APK</button>
+        </div>
+    </div>
+
+    <div class="workspace">
+        <div class="top-navbar">
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" id="fileName" placeholder="index.html" style="width: 180px;">
+                <button class="btn btn-blue" style="padding: 8px 15px;" onclick="commitFileSave()">💾 Save & Execute</button>
+            </div>
+            <div>
+                <button class="btn" style="background:#6e7681; padding: 8px 15px;" onclick="renderLivePreview()">🔄 Live Preview Sync</button>
+            </div>
+        </div>
+
+        <div class="editor-zone">
+            <textarea id="sourceCode" placeholder=""></textarea>
+            <iframe id="liveSandbox" class="live-preview"></iframe>
+        </div>
+    </div>
+
+    <script>
+        let operationalProject = "DefaultWorkspace";
+
+        async function initProject() {
+            const pName = document.getElementById('projName').value;
+            if(!pName) return alert('Bhai, Project name daalna compulsory hai!');
+            operationalProject = pName;
+            
+            const response = await fetch('/api/create-project', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ projectName: pName })
+            });
+            const status = await response.json();
+            alert(status.message || status.error);
+        }
+
+        async function commitFileSave() {
+            const fName = document.getElementById('fileName').value || 'index.html';
+            const codeData = document.getElementById('sourceCode').value;
+            
+            const response = await fetch('/api/save-file', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ projectName: operationalProject, fileName: fName, code: codeData })
+            });
+            const status = await response.json();
+            if(status.success) {
+                renderLivePreview();
+            } else {
+                alert("Error: " + status.error);
+            }
+        }
+
+        function renderLivePreview() {
+            const rawCode = document.getElementById('sourceCode').value;
+            const sandboxIframe = document.getElementById('liveSandbox');
+            sandboxIframe.srcdoc = rawCode; 
+        }
+
+        async function uploadZipProject() {
+            const zipInput = document.getElementById('zipFile').files[0];
+            if(!zipInput) return alert("Bhai, pehle ZIP file select karo!");
+            
+            const formData = new FormData();
+            formData.append('zipFile', zipInput);
+            formData.append('projectName', operationalProject);
+
+            alert("ZIP Uploading aur Extraction shuru ho gaya hai...");
+            const response = await fetch('/api/upload-zip', { method: 'POST', body: formData });
+            const status = await response.json();
+            alert(status.message || status.error);
+        }
+
+        async function triggerApkCompilation() {
+            const formData = new FormData();
+            formData.append('projectName', operationalProject);
+            formData.append('appName', document.getElementById('apkName').value);
+            formData.append('packageName', document.getElementById('pkgName').value);
+            formData.append('version', document.getElementById('appVersion').value);
+            formData.append('entryFile', document.getElementById('entryFile').value);
+            
+            const iconFile = document.getElementById('appIcon').files[0];
+            if(iconFile) formData.append('appIcon', iconFile);
+
+            alert("Raj Coding Engine: Compiler started inside isolated sandbox Docker environment. Please wait...");
+            
+            const response = await fetch('/api/build-apk', { method: 'POST', body: formData });
+            const status = await response.json();
+            
+            if(status.success) {
+                alert("Badhai ho! APK Build successfully complete.");
+                window.location.href = status.downloadUrl; // Automatically download the generated APK
+            } else {
+                alert("Build Failed: " + status.error);
+            }
+        }
+    </script>
+</body>
+</html>
